@@ -428,8 +428,10 @@ class Invoice
         $vars['source_invoice_id'] = $vars['invoice_id'];
 
         // process items
-        foreach ($vars['items'] as $key => $item) {
-            $vars['items'][$key] = $item->payload();
+        if (isset($vars['items'])) {
+            foreach ($vars['items'] as $key => $item) {
+                $vars['items'][$key] = $item->payload();
+            }
         }
 
         // process beneficiaries
