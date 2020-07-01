@@ -1,0 +1,40 @@
+{
+    "name": "ratapay/ratapayphp",
+    "description": "Ratapay PHP Integration",
+    "keywords": [
+        "ratapay",
+        "ratapayphp"
+    ],
+    "homepage": "https://github.com/ratapay/ratapay-php",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ratapay",
+            "email": "tech@ratapay.co.id",
+            "homepage": "https://ratapay.co.id",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php" : ">=7.2.0",
+        "guzzlehttp/guzzle": "~6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit" : "4.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "ratapay\\ratapayphp\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ratapay\\ratapayphp\\Test\\": "tests"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
