@@ -77,7 +77,7 @@ class Client
         }
 
         // get token data from cache file, if already declared and stil valid
-        $filename = dirname(__FILE__).'\..\data\.token';
+        $filename = dirname(__FILE__).'/../data/.token';
         $token_data_raw = file_get_contents($filename);
         $token_data = json_decode($token_data_raw);
 
@@ -93,11 +93,11 @@ class Client
                         'scope' => '*'
                         ]
                         ]);
-            } catch (RequestException | ClientException $e) {
-                $response = $e->getResponse();
-                if (empty($response)) {
-                    throw new \Exception('Empty Response');
-                } else {
+                    } catch (RequestException | ClientException $e) {
+                        $response = $e->getResponse();
+                        if (empty($response)) {
+                            throw new \Exception('Empty Response');
+                        } else {
                     throw new \Exception((string)$response->getBody());
                 }
             }
