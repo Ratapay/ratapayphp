@@ -121,7 +121,20 @@ class Client
      * @return Object Invoice Creation Response Details
      */
 
-    public function createInvoice(Invoice $invoice)
+    public function createInvoice(Invoice $invoice) {
+        $this->createTransaction($invoice);
+    }
+
+    /**
+     * Send Invoice Creation Request to Ratapay
+     * Validate Amount and Share Data
+     *
+     * @param Invoice Invoice to be Created
+     *
+     * @return Object Invoice Creation Response Details
+     */
+
+    public function createTransaction(Invoice $invoice)
     {
         // validate invoice
         $validate = $invoice->validate();
