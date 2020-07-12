@@ -93,11 +93,11 @@ class Client
                         'scope' => '*'
                         ]
                         ]);
-                    } catch (RequestException | ClientException $e) {
-                        $response = $e->getResponse();
-                        if (empty($response)) {
-                            throw new \Exception('Empty Response');
-                        } else {
+            } catch (RequestException | ClientException $e) {
+                $response = $e->getResponse();
+                if (empty($response)) {
+                    throw new \Exception('Empty Response');
+                } else {
                     throw new \Exception((string)$response->getBody());
                 }
             }
@@ -121,7 +121,8 @@ class Client
      * @return Object Invoice Creation Response Details
      */
 
-    public function createInvoice(Invoice $invoice) {
+    public function createInvoice(Invoice $invoice)
+    {
         $this->createTransaction($invoice);
     }
 
