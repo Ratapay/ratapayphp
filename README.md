@@ -153,9 +153,6 @@ The <code>$result</code> will be an object which contain data as follow:
 3. payment_url: url for the payment process for the payer, only available if status is success
 4. data: array of string indicating which invoice that the transaction is based on, containing: invoice_id, note, and ref as the reference number from Ratapay, only available if status is success
 
-
-__Properties__
-
 ## Testing
 
 ``` bash
