@@ -10,11 +10,13 @@ Via Composer
 ``` bash
 $ composer require ratapay/ratapayphp
 ```
-Thn require the autoload in your project
+Then require the autoload in your project
 
 ``` php
 require_once "vendor/autoload.php";
 ```
+
+The above require usually not necessary when using a framework such as Laravel. As the framework already has their package loader in place.
 
 ## Usage
 
@@ -152,6 +154,43 @@ The <code>$result</code> will be an object which contain data as follow:
 2. message: an error message of the reason why the transaction creation failed, only available if status is failed
 3. payment_url: url for the payment process for the payer, only available if status is success
 4. data: array of string indicating which invoice that the transaction is based on, containing: invoice_id, note, and ref as the reference number from Ratapay, only available if status is success
+
+## Sandbox
+
+When using sandbox mode, the payment can be simulated by visiting [Sandbox Payment Simulation Page](https://dev.ratapay.co.id/simulate).
+
+Enter the payment reference number then click pay to simulate the transaction payment.
+
+The default payment method will use Ratapay balance, so if the tested account did not have balance in their account, the payment will fail. Hence, open the payment instruction first then choose the preferred payment method before attempting to simulate the payment.
+
+## Callback
+
+Ratapay sends a POST callback on certain event, one of those is a succesful payment, which contains these data
+
+| property | type   | note                                 |
+|----------|--------|--------------------------------------|
+| data     | String | A json encoded data of the callback  |
+| hash     | String | Hash of the data                     |
+
+To verify the data againts the hash, use <code>hash_hmac</code> function with sha256 algo and merchant secret as the hash key.
+
+example:
+
+```php
+$valid = hash_equals($_POST['hash'], hash_hmac('sha256', $_POST['data'], $merchant_key));
+```
+
+The data contains following information
+| Property       | Type    | Note                                        |
+|----------------|---------|---------------------------------------------|
+| action         | Integer | Callback action type = 1                    |
+| invoice_id     | String  | Invoice ID from merchant system             |
+| paysystem      | String  | Payment channel used to pay the transaction |
+| amount         | Integer | Amount of transaction paid                  |
+| unique_code    | Integer | Unique code applied to payment              |
+| gateway_charge | Integer | Gateway charge applied to payment           |
+| merchant_id    | Integer | Merchant ID                                 |
+| ref            | String  | Transaction reference number                |
 
 ## Testing
 
