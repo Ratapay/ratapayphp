@@ -161,7 +161,7 @@ When using sandbox mode, the payment can be simulated by visiting [Sandbox Payme
 
 Enter the payment reference number then click pay to simulate the transaction payment.
 
-The default payment method will use Ratapay balance, so if the tested account did not have balance in their account, the payment will fail. Hence, open the payment instruction first then choose the preferred payment method before attempting to simulate the payment.
+The default payment method will use Ratapay balance, so if the tested account did not have balance in their account, the payment will fail. Hence, open the payment instruction first by visiting <code>payment_url</code> defined in transaction creation result, then choose the preferred payment method before attempting to simulate the payment.
 
 ## Callback
 
