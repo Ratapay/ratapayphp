@@ -150,10 +150,10 @@ Where <code>$invoice</code> is an invoice object which already been defined befo
 
 The <code>$result</code> will be an object which contain data as follow:
 
-1. status: success or failed, indicating transaction creation result status
-2. message: an error message of the reason why the transaction creation failed, only available if status is failed
-3. payment_url: url for the payment process for the payer, only available if status is success
-4. data: array of string indicating which invoice that the transaction is based on, containing: invoice_id, note, and ref as the reference number from Ratapay, only available if status is success
+1. <code>status</code> : success or failed, indicating transaction creation result status
+2. <code>message</code> : an error message of the reason why the transaction creation failed, only available if status is failed
+3. <code>payment_url</code> : url for the payment process for the payer, only available if status is success
+4. <code>data</code> : array of string indicating which invoice that the transaction is based on, containing: invoice_id, note, and ref as the reference number from Ratapay, only available if status is success
 
 ## Sandbox
 
@@ -186,7 +186,7 @@ The data contains following information
 | action         | Integer | Callback action type = 1                    |
 | invoice_id     | String  | Invoice ID from merchant system             |
 | paysystem      | String  | Payment channel used to pay the transaction |
-| amount         | Integer | Amount of transaction paid                  |
+| amount         | Integer | Amount of payment                           |
 | unique_code    | Integer | Unique code applied to payment              |
 | gateway_charge | Integer | Gateway charge applied to payment           |
 | merchant_id    | Integer | Merchant ID                                 |
