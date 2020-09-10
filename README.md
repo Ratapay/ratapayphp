@@ -46,6 +46,7 @@ __Properties__
 | email            | String  | Y        | 64 Char  | Null    | Payer email address                                                               |
 | invoice_id       | String  | Y        | 25 Char  | Null    | Merchant invoice ID                                                               |
 | amount           | Integer | Y        | 8 Bytes  | Null    | Payment amount                                                                    |
+| paysystem        | String  | N        | 16 Char  | Null    | Payment System ID which will be used for this invoice                             |
 | second_amount    | Integer | N        | 8 Bytes  | 0       | Total amount of each recurring payment                                            |
 | first_period     | String  | N        | 4 Char   | Null    | Period between the initial payment with the first recurring payment               |
 | second_period    | String  | N        | 4 Char   | Null    | Period between each recurring payment                                             |
@@ -63,6 +64,8 @@ The first_period, second_period, and refund_threshold use a period format define
 where the first part is the nominator and the second part is the unit in either day (D), month (M), or Year (Y)
 
 for example a 7 day period would be 7D
+
+To see the list of available Payment System ID (paysys_id) send a GET request to https://api.ratapay.co.id/v2/gateway/list for production or https://dev.ratapay.co.id/v2/gateway/list for sandbox
 
 __Method__
 
