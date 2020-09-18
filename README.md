@@ -46,6 +46,7 @@ __Properties__
 | email            | String  | Y        | 64 Char  | Null    | Payer email address                                                               |
 | invoice_id       | String  | Y        | 25 Char  | Null    | Merchant invoice ID                                                               |
 | amount           | Integer | Y        | 8 Bytes  | Null    | Payment amount                                                                    |
+| name             | String  | N        | 64 Char  | Null    | Payer name                                                               |
 | paysystem        | String  | N        | 16 Char  | Null    | Payment System ID which will be used for this invoice                             |
 | second_amount    | Integer | N        | 8 Bytes  | 0       | Total amount of each recurring payment                                            |
 | first_period     | String  | N        | 4 Char   | Null    | Period between the initial payment with the first recurring payment               |
@@ -131,7 +132,7 @@ __Properties__
 
 ### __5. Client__
 
-Client will process the invoice to Ratapay
+Client will process the request to Ratapay
 
 Instantiated with
 
@@ -143,7 +144,7 @@ Data on each parameter except <code>$sandbox</code> can be obtained from point 1
 
 Whereas the <code>$sandbox</code> is a flag to define wether to use sandbox mode or not, default is true.
 
-To process the transaction creation just do
+#### __A. Creating Transaction__
 
 ``` php
 $result = $client->createTransaction($invoice);
@@ -157,6 +158,42 @@ The <code>$result</code> will be an object which contain data as follow:
 2. <code>message</code> : an error message of the reason why the transaction creation failed, only available if status is failed
 3. <code>payment_url</code> : url for the payment process for the payer, only available if status is success
 4. <code>data</code> : array of string indicating which invoice that the transaction is based on, containing: invoice_id, note, and ref as the reference number from Ratapay, only available if status is success
+
+#### __B. Getting Own Account Info__
+
+``` php
+$result = $client->getAccount();
+```
+
+The <code>$result</code> will be an object which contain data as follow:
+
+1. <code>status</code> : success or failed, indicating account info fetching status
+2. <code>account</code> : account info details
+
+#### __C. Getting Another Account Info__
+
+``` php
+$result = $client->getAccount(['email' => $email]);
+```
+The <code>$result</code> will be an object which contain data as follow:
+
+1. <code>status</code> : success or failed, indicating account info fetching status
+2. <code>account</code> : account info details if request status is success
+3. <code>error</code> : short info about the error
+3. <code>message</code> : long error message info
+
+If the <code>error</code> is 'none' or 'waiting' then you have to ask user consent to link their account to your merchant data by executing following method
+
+``` php
+$result = $client->linkAccount($email, $username);
+```
+<code>$username</code> is optional, it can be used to track the user if your system identify user by their username and the user change their email.
+The <code>$result</code> will be an object which contain data as follow:
+
+1. <code>status</code> : success or failed, indicating account info fetching status
+2. <code>link</code> : link to ratapay consent page to approve the linkage
+3. <code>error</code> : short info about the error
+3. <code>message</code> : long error message info
 
 ## Sandbox
 
