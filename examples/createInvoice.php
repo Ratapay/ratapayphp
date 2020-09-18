@@ -62,6 +62,6 @@ $invoice->addBeneficiary($beneficiary);
 $invoice->addBeneficiary($beneficiary2);
 
 $client = new \ratapay\ratapayphp\Client(101, 'abc', 'def', 'ghi');
-$invoice = $client->createInvoice($invoice);
+$invoice = $client->createTransaction($invoice);
 echo $invoice->payment_url;
 // header('Location: ' . $invoice->payment_url);
