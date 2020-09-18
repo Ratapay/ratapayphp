@@ -70,13 +70,13 @@ class Client
         $this->api_secret = $api_secret;
         $this->sandbox = $sandbox;
 
-        // adjust base url accoirding to sandbox flag
+        // adjust base url according to sandbox flag
         $this->base_url = 'https://dev.ratapay.co.id/v2';
         if (!$sandbox) {
             $this->base_url = 'https://api.ratapay.co.id/v2';
         }
 
-        // get token data from cache file, if already declared and stil valid
+        // get token data from cache file, if already declared and still valid
         $filename = dirname(__FILE__).'/../data/.token';
         $token_data_raw = file_get_contents($filename);
         $token_data = json_decode($token_data_raw);
@@ -199,6 +199,186 @@ class Client
                 throw new \Exception('Empty Response');
             } else {
                 throw new \Exception((string)$response->getBody());
+            }
+        }
+    }
+
+    /**
+     * Get Account Details
+     *
+     * @param Array Query params to get account details
+     *
+     * @return Object Account details result
+     */
+
+    public function getAccount($params = [])
+    {
+         // data preparation
+        $endpoint = '/account';
+        if (count($params) > 0) {
+            $iter = 0;
+            foreach ($params as $key => $value) {
+                if ($iter == 0) {
+                    $endpoint .= sprintf('?%s=%s', $key, $value);
+                    $iter++;
+                } else {
+                    $endpoint .= sprintf('&%s=%s', $key, $value);
+                }
+            }
+        }
+        $fmt = date('Y-m-d\TH:i:s');
+        $iso_time = sprintf("$fmt.%s%s", substr(microtime(), 2, 3), date('P'));
+        $payload = null;
+        $signature = Signature::generate('GET', $endpoint, $payload, $this->api_token, $this->api_secret, $iso_time);
+        $client = new guzzleClient();
+        try {
+            $response = $client->get($this->base_url . $endpoint, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->api_token,
+                    'X-RATAPAY-SIGN' => $signature,
+                    'X-RATAPAY-TS' => $iso_time,
+                    'X-RATAPAY-KEY' => $this->api_key
+                ]
+            ]);
+             
+            $responseBody = (string)$response->getBody();
+            $responseData = json_decode($responseBody);
+ 
+            if (!empty($responseData) && $responseData->success) {
+                unset($responseData->success);
+                $responseData->status = 'success';
+                return $responseData;
+            } elseif (!empty($responseData) && !$responseData->success) {
+                return (object)[
+                    'status' => 'failed',
+                    'error' => isset($responseData->error) ? $responseData->error : 'error',
+                    'message' => isset($responseData->msg) ? $responseData->msg : 'Account Details Fetching Failed'
+                ];
+            } elseif (empty($responseData)) {
+                return (object)[
+                    'status' => 'failed',
+                    'error' => 'empty',
+                    'message' => 'Empty Response'
+                ];
+            } else {
+                return (object)[
+                    'status' => 'failed',
+                    'error' => 'unknown',
+                    'message' => 'Unknown Error Occcurred'
+                ];
+            }
+        } catch (RequestException | ClientException $e) {
+            $response = $e->getResponse();
+
+            $responseBody = (string)$response->getBody();
+            $responseData = json_decode($responseBody);
+            
+            if (!empty($responseData) && !$responseData->success) {
+                return (object)[
+                    'status' => 'failed',
+                    'error' => isset($responseData->error) ? $responseData->error : 'error',
+                    'message' => isset($responseData->msg) ? $responseData->msg : 'Account Details Fetching Failed'
+                ];
+            } elseif (empty($responseData)) {
+                return (object)[
+                    'status' => 'failed',
+                    'error' => 'empty',
+                    'message' => 'Empty Response'
+                ];
+            } else {
+                return (object)[
+                    'status' => 'failed',
+                    'error' => 'unknown',
+                    'message' => 'Unknown Error Occcurred'
+                ];
+            }
+        }
+    }
+
+    /**
+     * Link Account to Merchant
+     *
+     * @param Array Query params to get account details
+     *
+     * @return Object Account details result
+     */
+
+    public function linkAccount($email, $username = null)
+    {
+        // data preparation
+        if (is_null($username)) {
+            $username = str_replace('.', '_', str_replace('@', '_', $email));
+        }
+        $endpoint = '/account/link';
+        $fmt = date('Y-m-d\TH:i:s');
+        $iso_time = sprintf("$fmt.%s%s", substr(microtime(), 2, 3), date('P'));
+        $payload = [
+            'email' => $email,
+            'username' => $username
+        ];
+        $signature = Signature::generate('POST', $endpoint, $payload, $this->api_token, $this->api_secret, $iso_time);
+        $client = new guzzleClient();
+        try {
+            $response = $client->post($this->base_url . $endpoint, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->api_token,
+                    'X-RATAPAY-SIGN' => $signature,
+                    'X-RATAPAY-TS' => $iso_time,
+                    'X-RATAPAY-KEY' => $this->api_key
+                ],
+                'form_params' => $payload
+            ]);
+             
+            $responseBody = (string)$response->getBody();
+            $responseData = json_decode($responseBody);
+ 
+            if (!empty($responseData) && $responseData->success) {
+                unset($responseData->success);
+                $responseData->status = 'success';
+                return $responseData;
+            } elseif (!empty($responseData) && !$responseData->success) {
+                return (object)[
+                    'status' => 'failed',
+                    'error' => isset($responseData->error) ? $responseData->error : 'error',
+                    'message' => isset($responseData->msg) ? $responseData->msg : 'Failed to Generate Account Link URL'
+                ];
+            } elseif (empty($responseData)) {
+                return (object)[
+                    'status' => 'failed',
+                    'error' => 'empty',
+                    'message' => 'Empty Response'
+                ];
+            } else {
+                return (object)[
+                    'status' => 'failed',
+                    'error' => 'unknown',
+                    'message' => 'Unknown Error Occcurred'
+                ];
+            }
+        } catch (RequestException | ClientException $e) {
+            $response = $e->getResponse();
+
+            $responseBody = (string)$response->getBody();
+            $responseData = json_decode($responseBody);
+
+            if (!empty($responseData) && !$responseData->success) {
+                return (object)[
+                    'status' => 'failed',
+                    'error' => isset($responseData->error) ? $responseData->error : 'error',
+                    'message' => isset($responseData->msg) ? $responseData->msg : 'Failed to Generate Account Link URL'
+                ];
+            } elseif (empty($responseData)) {
+                return (object)[
+                    'status' => 'failed',
+                    'error' => 'empty',
+                    'message' => 'Empty Response'
+                ];
+            } else {
+                return (object)[
+                    'status' => 'failed',
+                    'error' => 'unknown',
+                    'message' => 'Unknown Error Occcurred'
+                ];
             }
         }
     }
