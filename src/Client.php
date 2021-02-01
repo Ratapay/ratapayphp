@@ -160,6 +160,8 @@ class Client
                         'invoice_id' => $responseData->invoice_data->source_invoice_id,
                         'note' => $responseData->invoice_data->note,
                         'ref' => $responseData->invoice_data->ref,
+                        'unique_code' => $responseData->invoice_data->unique_code,
+                        'gateway_charge' => $responseData->invoice_data->gateway_charge,
                     ],
                     'payment_url' => $payment_url_base . '/payment/' . $responseData->invoice_data->ref
                 ];

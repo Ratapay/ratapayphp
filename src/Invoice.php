@@ -104,6 +104,12 @@ class Invoice
     protected $item_ids = [];
     
     /**
+     * Paysystem specified for the Invoice
+     * @var String
+     */
+    protected $paysystem;
+    
+    /**
      * An array of invoice beneficiaries
      * @var BeneficiaryClass[]
      */
@@ -139,6 +145,7 @@ class Invoice
         $url_callback = isset($data['url_callback']) ? $data['url_callback'] : null;
         $url_success = isset($data['url_success']) ? $data['url_success'] : null;
         $url_failed = isset($data['url_failed']) ? $data['url_failed'] : null;
+        $paysystem = isset($data['paysystem']) ? $data['paysystem'] : null;
         
         $invalids = [];
         // Sanitize Note
@@ -234,6 +241,12 @@ class Invoice
                 $invalids['$url_failed'] = 'Invalid Invoice URL Failed Value';
             }
         }
+
+        // Sanitize Paysystem
+        $paysystem = filter_var($paysystem, FILTER_SANITIZE_STRING);
+        if (!$paysystem) {
+            $invalids['paysystem'] = 'Invalid Invoice ID Value';
+        }
         
         if (!empty($invalids)) {
             $errorArray = [];
@@ -257,6 +270,7 @@ class Invoice
         $this->url_callback = $url_callback;
         $this->url_success = $url_success;
         $this->url_failed = $url_failed;
+        $this->paysystem = $paysystem;
     }
 
     /**
