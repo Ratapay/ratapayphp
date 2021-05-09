@@ -243,9 +243,11 @@ class Invoice
         }
 
         // Sanitize Paysystem
-        $paysystem = filter_var($paysystem, FILTER_SANITIZE_STRING);
-        if (!$paysystem) {
-            $invalids['paysystem'] = 'Invalid Invoice ID Value';
+        if (!empty($paysystem)) {
+            $paysystem = filter_var($paysystem, FILTER_SANITIZE_STRING);
+            if (!$paysystem) {
+                $invalids['paysystem'] = 'Invalid Paysystem Value';
+            }
         }
         
         if (!empty($invalids)) {
