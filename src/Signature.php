@@ -33,6 +33,7 @@ class Signature
             $hash = hash("sha256", "");
         }
         
+        $endpoint = str_replace('+', '%20', $endpoint);
         $stringToSign   = $method .":". $endpoint .":". $api_token . ":" . $hash . ":" . $iso_time;
         $stringToSign = preg_replace('/\s/', '', $stringToSign);
         

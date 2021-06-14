@@ -192,6 +192,168 @@ class Client
     }
 
     /**
+     * Get Invoice List from Ratapay
+     * Validate Parameters
+     *
+     * @param String $reference invoice reference
+     *
+     * @param String $invoice_id merchant invoice id 
+     *
+     * @param Array $creation_time range of invoice creation time
+     *
+     * @param Array $paid_time range of invoice paid time
+     *
+     * @param Int $offset listing offset
+     *
+     * @param Int $limit listing limit max 30
+     *
+     * @return Object Invoice Listing
+     */
+
+    public function listTransaction($reference = '', $invoice_id = '', $creation_time = [], $paid_time = [], $offset = 0, $limit = 5)
+    {
+        // max limit 30
+        $limit = min($limit, 30);
+        
+        $params = [
+            'offset' => $offset,
+            'limit' => $limit
+        ];
+
+        $invalids = [];
+
+        $conditions = [];
+        if (!empty($reference)) {
+            $reference = filter_var($reference, FILTER_SANITIZE_STRING);
+            if (!$reference) {
+                $invalids['reference'] = 'Invalid Reference Value';
+            } else {
+                $conditions['ref'] = $reference;
+            }
+        }
+
+        if (!empty($invoice_id)) {
+            $invoice_id = filter_var($invoice_id, FILTER_SANITIZE_STRING);
+            if (!$invoice_id) {
+                $invalids['invoice_id'] = 'Invalid Invoice ID Value';
+            } else {
+                $conditions['source_invoice_id'] = $invoice_id;
+            }
+        }
+        
+        if (!empty($creation_time)) {
+            if (count($creation_time) < 2) {
+                $invalids['creation_time'] = 'Creation time parameters must be an array of start and end time';
+            } else {
+                $date_time = $creation_time[0];
+                $date_time_end = $creation_time[1];
+                $date_time = filter_var($date_time, FILTER_VALIDATE_INT);
+                if (!$date_time) {
+                    $invalids['creation_time[0]'] = 'Invalid Creation Time Start Value';
+                }
+                $date_time_end = filter_var($date_time_end, FILTER_VALIDATE_INT);
+                if (!$date_time_end) {
+                    $invalids['creation_time[1]'] = 'Invalid Creation Time End Value';
+                }
+                $conditions['date_time'] = date('Y-m-d H:i:s', $date_time);
+                $conditions['date_time_end'] = date('Y-m-d H:i:s', $date_time_end);
+            }
+        }
+        
+        if (!empty($paid_time)) {
+            if (count($paid_time) < 2) {
+                $invalids['paid_time'] = 'Creation time parameters must be an array of start and end time';
+            } else {
+                $finished_date_time = $paid_time[0];
+                $finished_date_time_end = $paid_time[1];
+                $finished_date_time = filter_var($finished_date_time, FILTER_VALIDATE_INT);
+                if (!$finished_date_time) {
+                    $invalids['paid_time[0]'] = 'Invalid Creation Time Start Value';
+                }
+                $finished_date_time_end = filter_var($finished_date_time_end, FILTER_VALIDATE_INT);
+                if (!$finished_date_time_end) {
+                    $invalids['paid_time[1]'] = 'Invalid Creation Time End Value';
+                }
+                $conditions['finished_date_time'] = date('Y-m-d H:i:s', $finished_date_time);
+                $conditions['finished_date_time_end'] = date('Y-m-d H:i:s', $finished_date_time_end);
+            }
+        }
+
+        if (!empty($invalids)) {
+            $errorArray = [];
+            foreach ($invalids as $field => $message) {
+                $errorArray[] = $field . ': ' . $message;
+            }
+            $errorMessage = implode(', ', $errorArray);
+            throw new \Exception($errorMessage);
+        }
+
+        // data preparation
+        $conditionString = '';
+        if (!empty($conditions)) {
+            ksort($conditions);
+            $conditionString = http_build_query(['condition' => $conditions]);
+        }
+        $endpoint = "/transaction?". $conditionString ."&limit=$limit&offset=$offset";
+        $fmt = date('Y-m-d\TH:i:s');
+        $iso_time = sprintf("$fmt.%s%s", substr(microtime(), 2, 3), date('P'));
+        $payload = null;
+        $signature = Signature::generate('GET', $endpoint, $payload, $this->api_token, $this->api_secret, $iso_time);
+        $client = new guzzleClient();
+        try {
+            $response = $client->get($this->base_url . $endpoint, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->api_token,
+                    'X-RATAPAY-SIGN' => $signature,
+                    'X-RATAPAY-TS' => $iso_time,
+                    'X-RATAPAY-KEY' => $this->api_key
+                ]
+            ]);
+            
+            $responseBody = (string)$response->getBody();
+            $responseData = json_decode($responseBody);
+
+            if (!empty($responseData) && $responseData->success) {
+                $unsetAttributes = ['is_settled', 'acc_balance', 'id', 'currency', 'source_ip', 'paylink_id', 'parent_id', 'is_settled', 'account_number', 'email', 'user_note', 'type'];
+                $renameAttributes = ['date_time' => 'creation_time', 'finished_date_time' => 'paid_time', 'processing_date_time' => 'split_time'];
+                $responseData->status = 'success';
+                unset($responseData->success);
+                foreach ($responseData->list as $idx => $val) {
+                    foreach ($unsetAttributes as $attr) {
+                        unset($responseData->list[$idx]->$attr);
+                    }
+                    foreach ($renameAttributes as $src => $tgt) {
+                        $responseData->list[$idx]->$tgt = $responseData->list[$idx]->$src;
+                        unset($responseData->list[$idx]->$src);
+                    }
+                }
+                return $responseData;
+            } elseif (!empty($responseData) && !$responseData->success) {
+                $responseData->status = 'failed';
+                unset($responseData->success);
+                return $responseData;
+            } elseif (empty($responseData)) {
+                return (object)[
+                    'status' => 'failed',
+                    'message' => 'Empty Response'
+                ];
+            } else {
+                return (object)[
+                    'status' => 'failed',
+                    'message' => 'Unknown Error Occcurred'
+                ];
+            }
+        } catch (RequestException | ClientException $e) {
+            $response = $e->getResponse();
+            if (empty($response)) {
+                throw new \Exception('Empty Response');
+            } else {
+                throw new \Exception((string)$response->getBody());
+            }
+        }
+    }
+
+    /**
      * Get Account Details
      *
      * @param Array Query params to get account details
@@ -286,7 +448,9 @@ class Client
     /**
      * Link Account to Merchant
      *
-     * @param Array Query params to get account details
+     * @param String account email to be linked
+     *
+     * @param String username of the related account email
      *
      * @return Object Account details result
      */

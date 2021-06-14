@@ -159,7 +159,28 @@ The <code>$result</code> will be an object which contain data as follow:
 3. <code>payment_url</code> : url for the payment process for the payer, only available if status is success
 4. <code>data</code> : array of string indicating which invoice that the transaction is based on, containing: invoice_id, note, and ref as the reference number from Ratapay, only available if status is success
 
-#### __B. Getting Own Account Info__
+#### __B. Listing Transaction__
+
+``` php
+$result = $client->listTransaction($reference = '', $invoice_id = '', $creation_time = [], $paid_time = [], $offset = 0, $limit = 5);
+```
+| Property            | Type    | Required    |  Default | Note   |
+|---------------------|---------|-------------|--------- |--------|
+| reference           | String  | N           | ''       | Transaction reference code |
+| invoice_id          | String  | N           | ''       | Merchant Invoice ID |
+| creation_time       | String  | N           | []       | range of transaction creation time in seconds [start_time, end_time] example [1622540704, 1623663904]|
+| paid_time           | Integer | N           | []     | range of transaction paid time in seconds [start_time, end_time] example [1622540704, 1623663904]|
+| offset              | Integer | N           | 0     | listing offset|
+| limit               | Integer | N           | 5     | listing limit, maximum 30 |
+
+The <code>$result</code> will be an object which contain data as follow:
+
+1. <code>status</code> : success or failed, indicating transaction listing result status
+2. <code>list</code> : list of retrieved transaction data
+3. <code>count</code> : total count of transaction records with specified conditions
+4. <code>totalAmount</code> : total amount of transaction records retrieved
+
+#### __C. Getting Own Account Info__
 
 ``` php
 $result = $client->getAccount();
