@@ -156,13 +156,7 @@ class Client
                 $payment_url_base = $this->sandbox ? 'https://appdev.ratapay.co.id' : 'https://app.ratapay.co.id';
                 return (object)[
                     'status' => 'success',
-                    'data' => [
-                        'invoice_id' => $responseData->invoice_data->source_invoice_id,
-                        'note' => $responseData->invoice_data->note,
-                        'ref' => $responseData->invoice_data->ref,
-                        'unique_code' => $responseData->invoice_data->unique_code,
-                        'gateway_charge' => $responseData->invoice_data->gateway_charge,
-                    ],
+                    'data' => $responseData->invoice_data,
                     'payment_url' => $payment_url_base . '/payment/' . $responseData->invoice_data->ref
                 ];
             } elseif (!empty($responseData) && !$responseData->success) {
