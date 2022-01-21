@@ -110,6 +110,12 @@ class Invoice
     protected $paysystem;
     
     /**
+     * Invoice expired time
+     * @var String
+     */
+    protected $expired_time;
+    
+    /**
      * An array of invoice beneficiaries
      * @var BeneficiaryClass[]
      */
@@ -247,6 +253,16 @@ class Invoice
             $paysystem = filter_var($paysystem, FILTER_SANITIZE_STRING);
             if (!$paysystem) {
                 $invalids['paysystem'] = 'Invalid Paysystem Value';
+            }
+        }
+
+        // check expired_time
+        if (isset($data['expired_time'])) {
+            list($valid, $dt) = $this->validateDate($data['expired_time'], 'c');
+            if (!$valid) {
+                $invalids['expired_time'] = 'Invalid Expired Date Format, must be ISO 8601 format e.g. 2022-01-01T01:00:00+07:00';
+            } else {
+                $this->expired_time = $data['expired_time'];
             }
         }
         
@@ -473,5 +489,12 @@ class Invoice
         }
 
         return $vars;
+    }
+
+    public function validateDate($date, $format = 'c')
+    {
+        $iso_format = 'Y-m-d\TH:i:sP';
+        $d = \DateTime::createFromFormat($iso_format, $date);
+        return [$d && $d->format($iso_format) === $date, $d];
     }
 }
