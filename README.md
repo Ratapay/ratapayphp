@@ -57,6 +57,7 @@ __Properties__
 | url_callback     | String  | N        | 255 Char | Null    | Merchant URL where Ratapay will send notification data about the invoice activity |
 | url_success      | String  | N        | 255 Char | Null    | URL where user will be redirected after succesful payment                         |
 | url_failed       | String  | N        | 255 Char | Null    | URL where user will ber redirected if the payment failed or cancelled             |
+| expired_time       | String  | N        | 32 Char | Null    | Time the invoice expired in iso 8601 format, e.g. 2022-01-01T10:00:00+07:00|
 
 The first_period, second_period, and refund_threshold use a period format defined as:
 
@@ -66,7 +67,7 @@ where the first part is the nominator and the second part is the unit in either 
 
 for example a 7 day period would be 7D
 
-To see the list of available Payment System ID (paysys_id) send a GET request to https://api.ratapay.co.id/v2/gateway/list for production or https://dev.ratapay.co.id/v2/gateway/list for sandbox
+To see the list of available Payment System ID (paysystem) send a GET request to https://api.ratapay.co.id/v2/gateway/list for production or https://dev.ratapay.co.id/v2/gateway/list for sandbox
 
 __Method__
 
