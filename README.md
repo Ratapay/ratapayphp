@@ -181,7 +181,72 @@ The <code>$result</code> will be an object which contain data as follow:
 3. <code>count</code> : total count of transaction records with specified conditions
 4. <code>totalAmount</code> : total amount of transaction records retrieved
 
-#### __C. Getting Own Account Info__
+#### __C. Execute Split__
+Normally, the refundable invoice fund will be split automatically if it is already past the refund threshold. However, if there is need to split it earlier, this function can be used.
+
+``` php
+$result = $client->confirmSplit($reference, $item_ids = []);
+```
+| Property            | Type    | Required    |  Default | Note   |
+|---------------------|---------|-------------|--------- |--------|
+| reference           | String  | Y           | ''       | Transaction reference code |
+| item_ids           | Array  | N           | []       | List of specific invoice item id to be splitted |
+
+If item_ids is specified, only item matched item will be splitted.
+
+#### __D. Extend Refund__
+It can be used to extend the refund threshold.
+
+``` php
+$result = $client->extendRefund($reference, $period, $item_ids = []);
+```
+| Property            | Type    | Required    |  Default | Note   |
+|---------------------|---------|-------------|--------- |--------|
+| reference           | String  | Y           | ''       | Transaction reference code |
+| period           | String  | Y           | ''       | How long is the extension, format [1-9][D/M/Y], e.g. 7D |
+| item_ids           | Array  | N           | []       | List of specific invoice item id to extend its refund threshold |
+
+If item_ids is specified, only item matched item will have its refund threshold extended.
+
+#### __E. Execute Refund__
+It can be used to execute refund before refund threshold.
+
+``` php
+$result = $client->confirmRefund($reference, $params);
+```
+| Property            | Type    | Required    |  Default | Note   |
+|---------------------|---------|-------------|--------- |--------|
+| reference           | String  | Y           | ''       | Transaction reference code |
+| params           | Array  | N           | null       | Specify refund rules |
+
+If doing full refund, the params is not used. But if doing partial refund, the params should be filled using these structures:
+- params structure to refund partially for the whole invoice
+``` php
+params = [
+        [0] => [
+            'type' => {% or $}
+            'value' => {value}
+        ]
+]
+```
+
+- params structure to refund partially for each specific item
+``` php
+params = [
+        {item_id_1} => [
+            'type' => {% or $} // optional, default $, will be ignored if specified but using qty
+            'value' => {value}, // required if no qty specified
+            'qty' => {qty} // required if no value specified
+        ]
+        {item_id_n} => [
+            'type' => {% or $}, // optional, default $, will be ignored if specified but using qty
+            'value' => {value}, // required if no qty specified
+            'qty' => {qty} // required if no value specified
+        ]
+]
+```
+
+#### __F. Getting Own Account Info__
 
 ``` php
 $result = $client->getAccount();
@@ -192,7 +257,7 @@ The <code>$result</code> will be an object which contain data as follow:
 1. <code>status</code> : success or failed, indicating account info fetching status
 2. <code>account</code> : account info details
 
-#### __C. Getting Another Account Info__
+#### __G. Getting Another Account Info__
 
 ``` php
 $result = $client->getAccount(['email' => $email]);
