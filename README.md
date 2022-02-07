@@ -220,10 +220,10 @@ $result = $client->confirmRefund($reference, $params);
 | params           | Array  | N           | null       | Specify refund rules |
 
 If doing full refund, the params is not used. But if doing partial refund, the params should be filled using these structures:
-- params structure to refund partially for the whole invoice
+- params structure to refund partially for the whole invoice, use item ID 0
 ``` php
-params = [
-        [0] => [
+$params = [
+        0 => [
             'type' => {% or $}
             'value' => {value}
         ]
@@ -232,12 +232,12 @@ params = [
 
 - params structure to refund partially for each specific item
 ``` php
-params = [
+$params = [
         {item_id_1} => [
             'type' => {% or $} // optional, default $, will be ignored if specified but using qty
             'value' => {value}, // required if no qty specified
             'qty' => {qty} // required if no value specified
-        ]
+        ],
         {item_id_n} => [
             'type' => {% or $}, // optional, default $, will be ignored if specified but using qty
             'value' => {value}, // required if no qty specified
@@ -245,6 +245,10 @@ params = [
         ]
 ]
 ```
+
+% means in percentage, maximum 100,
+
+$ means in value, up to item subtotal value
 
 #### __F. Getting Own Account Info__
 
