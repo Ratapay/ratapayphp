@@ -77,7 +77,11 @@ class Client
         }
 
         // get token data from cache file, if already declared and still valid
-        $filename = dirname(__FILE__).'/../data/.token';
+        if ($this->sandbox) {
+            $filename = dirname(__FILE__).'/../data/.tokensandbox';
+        } else {
+            $filename = dirname(__FILE__).'/../data/.token';
+        }
         $token_data_raw = file_get_contents($filename);
         $token_data = json_decode($token_data_raw);
 
