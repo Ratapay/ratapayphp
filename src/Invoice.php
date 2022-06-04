@@ -312,6 +312,34 @@ class Invoice
     }
     
     /**
+     * Add Multiple Item Objects to Invoice
+     *
+     * @param array $items Array of Items to be added
+     *
+     * @return none
+     */
+    public function addItems(array $items)
+    {
+        if (count($this->beneficiaries) > 0) {
+            return false;
+        }
+
+        $ids = [];
+        foreach ($items as $item) {
+            if (!$item instanceof Item) {
+                return false;
+            }
+            if (!$item->isValid()) {
+                return false;
+            }
+            $ids[] = $item->getId();
+        }
+        $this->items = array_merge($this->items, $items);
+        $this->item_ids = array_merge($this->item_ids, $ids);
+        return true;
+    }
+    
+    /**
      * Clear Invoice Items
      *
      * @return none
@@ -340,6 +368,30 @@ class Invoice
             return false;
         }
         $this->beneficiaries[] = $beneficiary;
+        return true;
+    }
+    
+
+    /**
+     * Add Multiple Beneficiary Objects to Invoice
+     *
+     * @param array $beneficiaries Array of Benficiary to be added
+     *
+     * @return none
+     */
+    public function addBeneficiaries(array $beneficiaries)
+    {
+        foreach ($beneficiaries as $beneficiary) {
+            if (!$beneficiary->isValid()) {
+                return false;
+            }
+            $item_id = $beneficiary->getItemId();
+            if (count($this->items) > 0 &&
+                ($item_id == null || !in_array($item_id, $this->item_ids))) {
+                return false;
+            }
+        }
+        $this->beneficiaries = $beneficiaries;
         return true;
     }
     
