@@ -331,7 +331,7 @@ class Invoice
             if (!$oItem->isValid()) {
                 return false;
             }
-            $ids[] = $item->getId();
+            $ids[] = $oItem->getId();
             $aItems[] = $oItem;
         }
         $this->items = array_merge($this->items, $aItems);
