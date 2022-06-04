@@ -74,8 +74,10 @@ __Method__
 | Method           | Parameter          | Return                      | Note                                                                                   |
 |------------------|--------------------|-----------------------------|----------------------------------------------------------------------------------------|
 | addItem          | Item Object        | Boolean                     | Add Item to Invoice                                                                    |
+| addItems         | Array              | Boolean                     | Add Multiple Items at once to the Invoice, each item data must conform to Invoice data requirements|
 | clearItem        | None               | Boolean                     | Clear Invoice items                                                                    |
 | addBeneficiary   | Beneficiary Object | Boolean                     | Add Beneficiary to Invoice                                                             |
+| addBeneficiaries | Array              | Boolean                     | Add Multiple Benficiaries at once to the Invoice, each beneficiary data must conform to Beneficiary data requirements |
 | clearBeneficiary | None               | Boolean                     | Clear Invoice beneficiaries                                                            |
 | getAmount        | String             | Integer                     | Get Invoice amount, use 'first' as parameter for amount and 'second' for second_amount |
 | getBeneficiaries | None               | Array of Beneficiary Object | Get all Invoice beneficiaries                                                          |
