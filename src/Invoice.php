@@ -120,6 +120,12 @@ class Invoice
      * @var BeneficiaryClass[]
      */
     protected $beneficiaries = [];
+    
+    /**
+     * A miscelaneous data
+     * @var Any
+     */
+    protected $misc = null;
 
     /**
      * Construct an Invoice Instance
@@ -289,6 +295,7 @@ class Invoice
         $this->url_success = $url_success;
         $this->url_failed = $url_failed;
         $this->paysystem = $paysystem;
+        $this->misc = $data['misc'];
     }
 
     /**
@@ -541,6 +548,13 @@ class Invoice
                 $vars['aff_share'] = $affs;
             }
             unset($vars['beneficiaries']);
+        }
+
+        if (isset($vars['misc'])) {
+            foreach ($vars['misc'] as $key => $value) {
+                $vars[$key] = $value;
+            }
+            unset($vars['misc']);
         }
 
         return $vars;
