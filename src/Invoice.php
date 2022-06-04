@@ -314,7 +314,7 @@ class Invoice
     /**
      * Add Multiple Item Objects to Invoice
      *
-     * @param array $items Array of Items to be added
+     * @param array $items Array of item data to be added
      *
      * @return none
      */
@@ -325,16 +325,16 @@ class Invoice
         }
 
         $ids = [];
+        $aItems = [];
         foreach ($items as $item) {
-            if (!$item instanceof Item) {
-                return false;
-            }
-            if (!$item->isValid()) {
+            $oItem = new Item($item);
+            if (!$oItem->isValid()) {
                 return false;
             }
             $ids[] = $item->getId();
+            $aItems[] = $oItem;
         }
-        $this->items = array_merge($this->items, $items);
+        $this->items = array_merge($this->items, $aItems);
         $this->item_ids = array_merge($this->item_ids, $ids);
         return true;
     }
@@ -375,23 +375,26 @@ class Invoice
     /**
      * Add Multiple Beneficiary Objects to Invoice
      *
-     * @param array $beneficiaries Array of Benficiary to be added
+     * @param array $beneficiaries Array of beneficiary data to be added
      *
      * @return none
      */
     public function addBeneficiaries(array $beneficiaries)
     {
+        $aBeneficiaries = [];
         foreach ($beneficiaries as $beneficiary) {
-            if (!$beneficiary->isValid()) {
+            $oBeneficiary = new Beneficiary($beneficiary);
+            if (!$oBeneficiary->isValid()) {
                 return false;
             }
-            $item_id = $beneficiary->getItemId();
+            $item_id = $oBeneficiary->getItemId();
             if (count($this->items) > 0 &&
                 ($item_id == null || !in_array($item_id, $this->item_ids))) {
                 return false;
             }
+            $aBeneficiaries[] = $oBeneficiary;
         }
-        $this->beneficiaries = $beneficiaries;
+        $this->beneficiaries = array_merge($this->beneficiaries, $aBeneficiaries);
         return true;
     }
     
