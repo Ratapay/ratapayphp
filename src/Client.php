@@ -353,6 +353,86 @@ class Client
     }
 
     /**
+     * Register New Ratapay Account
+     *
+     * @param Array Params for account creation details
+     *
+     * @return Object Account details result
+     */
+
+    public function registerAccount($params = [])
+    {
+        $endpoint = '/account';
+        $fmt = date('Y-m-d\TH:i:s');
+        $iso_time = sprintf("$fmt.%s%s", substr(microtime(), 2, 3), date('P'));
+        $signature = Signature::generate('POST', $endpoint, $params, $this->api_token, $this->api_secret, $iso_time);
+        $client = new guzzleClient();
+        try {
+            $response = $client->post($this->base_url . $endpoint, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->api_token,
+                    'X-RATAPAY-SIGN' => $signature,
+                    'X-RATAPAY-TS' => $iso_time,
+                    'X-RATAPAY-KEY' => $this->api_key
+                ],
+                'form_params' => $params
+            ]);
+             
+            $responseBody = (string)$response->getBody();
+            $responseData = json_decode($responseBody);
+ 
+            if (!empty($responseData) && $responseData->success) {
+                unset($responseData->success);
+                $responseData->status = 'success';
+                return $responseData;
+            } elseif (!empty($responseData) && !$responseData->success) {
+                return (object)[
+                    'status' => 'failed',
+                    'error' => isset($responseData->error) ? $responseData->error : 'error',
+                    'message' => isset($responseData->msg) ? $responseData->msg : 'Account Creation Failed'
+                ];
+            } elseif (empty($responseData)) {
+                return (object)[
+                    'status' => 'failed',
+                    'error' => 'empty',
+                    'message' => 'Empty Response'
+                ];
+            } else {
+                return (object)[
+                    'status' => 'failed',
+                    'error' => 'unknown',
+                    'message' => 'Unknown Error Occcurred'
+                ];
+            }
+        } catch (RequestException | ClientException $e) {
+            $response = $e->getResponse();
+
+            $responseBody = (string)$response->getBody();
+            $responseData = json_decode($responseBody);
+            
+            if (!empty($responseData) && !$responseData->success) {
+                return (object)[
+                    'status' => 'failed',
+                    'error' => isset($responseData->error) ? $responseData->error : 'error',
+                    'message' => isset($responseData->msg) ? $responseData->msg : 'Account Creation Failed'
+                ];
+            } elseif (empty($responseData)) {
+                return (object)[
+                    'status' => 'failed',
+                    'error' => 'empty',
+                    'message' => 'Empty Response'
+                ];
+            } else {
+                return (object)[
+                    'status' => 'failed',
+                    'error' => 'unknown',
+                    'message' => 'Unknown Error Occcurred'
+                ];
+            }
+        }
+    }
+
+    /**
      * Get Account Details
      *
      * @param Array Query params to get account details
