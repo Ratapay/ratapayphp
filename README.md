@@ -263,7 +263,20 @@ The <code>$result</code> will be an object which contain data as follow:
 1. <code>status</code> : success or failed, indicating account info fetching status
 2. <code>account</code> : account info details
 
-#### __G. Getting Another Account Info__
+#### __G. Registering New Account__
+
+``` php
+$result = $client->registerAccount(['email'=>$email,'name'=>$name,'password'=>$password]);
+```
+
+The <code>$result</code> will be an object which contain data as follow:
+
+1. <code>status</code> : success or failed, failed means account with the email already exist
+2. <code>account</code> : account info details if account creation status is success
+3. <code>error</code> : short info about the error
+3. <code>message</code> : long error message info
+
+#### __H. Getting Another Account Info__
 
 ``` php
 $result = $client->getAccount(['email' => $email]);
