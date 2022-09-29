@@ -295,7 +295,9 @@ class Invoice
         $this->url_success = $url_success;
         $this->url_failed = $url_failed;
         $this->paysystem = $paysystem;
-        $this->misc = $data['misc'];
+        if (isset($data['misc'])) {
+            $this->misc = $data['misc'];
+        }
     }
 
     /**
