@@ -71,8 +71,7 @@ class Client
         $this->sandbox = $sandbox;
 
         // adjust base url according to sandbox flag
-        $this->base_url = 'http://local.api.ratapay/v2';
-        // $this->base_url = 'https://dev.ratapay.co.id/v2';
+        $this->base_url = 'https://dev.ratapay.co.id/v2';
         if (!$sandbox) {
             $this->base_url = 'https://api.ratapay.co.id/v2';
         }
