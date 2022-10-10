@@ -106,7 +106,7 @@ class Item
 
         // Validate Subtotal
         $subtotal = filter_var($subtotal, FILTER_VALIDATE_INT);
-        if (!$subtotal) {
+        if ($subtotal === false) {
             $invalids['subtotal'] = 'Invalid Item Subtotal Value';
         }
 

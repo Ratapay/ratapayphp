@@ -105,7 +105,7 @@ class Beneficiary
 
         // Validate Share Amount
         $share_amount = filter_var($share_amount, FILTER_VALIDATE_INT);
-        if (!$share_amount) {
+        if ($share_amount === false) {
             $invalids['share_amount'] = 'Invalid Benficiary Share Amount Value';
         }
 
@@ -128,7 +128,7 @@ class Beneficiary
         // Validate Beneficiary Tier
         if (!is_null($tier)) {
             $tier = filter_var($tier, FILTER_VALIDATE_INT);
-            if (!$tier) {
+            if ($tier === false) {
                 $invalids['tier'] = 'Invalid Benficiary Tier Value';
             }
             $this->tier = $tier;
