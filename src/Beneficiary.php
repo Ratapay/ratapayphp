@@ -194,12 +194,14 @@ class Beneficiary
     {
         $vars = get_object_vars($this);
         foreach ($vars as $key => $value) {
-            if (empty($value)) {
-                unset($vars[$key]);
+            if ($value === 0) {
+                $vars[$key] = 0;
             } elseif ($value === true) {
                 $vars[$key] = 1;
             } elseif ($value === false) {
                 $vars[$key] = 0;
+            } elseif (empty($value)) {
+                unset($vars[$key]);
             }
         }
         return $vars;
