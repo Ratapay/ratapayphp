@@ -183,7 +183,7 @@ class Invoice
         
         // Validate Amount
         $amount = filter_var($amount, FILTER_VALIDATE_INT);
-        if ($amount !== FALSE) {
+        if ($amount === FALSE) {
             $invalids['amount'] = 'Invalid Invoice Amount Value';
         }
         
