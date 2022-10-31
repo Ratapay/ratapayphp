@@ -830,4 +830,73 @@ class Client
             }
         }
     }
+    
+    /**
+     * Add new beneficiaries after invoice creation
+     *
+     * @param $ref invoice reference to be refunded
+     * @param $beneficiaries list of new beneficiaries to be added
+     *
+     * @return Object Confirm Refund Response Details
+     */
+
+    public function addBeneficiaries($ref, $beneficiaries)
+    {
+        // data preparation
+        $endpoint = '/transaction/beneficiaries/add';
+        $fmt = date('Y-m-d\TH:i:s');
+        $iso_time = sprintf("$fmt.%s%s", substr(microtime(), 2, 3), date('P'));
+        $payload = [
+            'ref' => $ref,
+            'beneficiaries' => $beneficiaries
+        ];
+
+        $payload['merchant_id'] = $this->merchant_id;
+        $signature = Signature::generate('POST', $endpoint, $payload, $this->api_token, $this->api_secret, $iso_time);
+
+        $client = new guzzleClient();
+        try {
+            $response = $client->post($this->base_url . $endpoint, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->api_token,
+                    'X-RATAPAY-SIGN' => $signature,
+                    'X-RATAPAY-TS' => $iso_time,
+                    'X-RATAPAY-KEY' => $this->api_key
+                ],
+                'form_params' => $payload
+            ]);
+            
+            $responseBody = (string)$response->getBody();
+            $responseData = json_decode($responseBody);
+
+            if (!empty($responseData) && $responseData->success) {
+                return (object)[
+                    'status' => 'success',
+                    'data' => $responseData
+                ];
+            } elseif (!empty($responseData) && !$responseData->success) {
+                return (object)[
+                    'status' => 'failed',
+                    'message' => isset($responseData->msg) ? $responseData->msg : 'Invoice Creation Failed'
+                ];
+            } elseif (empty($responseData)) {
+                return (object)[
+                    'status' => 'failed',
+                    'message' => 'Empty Response'
+                ];
+            } else {
+                return (object)[
+                    'status' => 'failed',
+                    'message' => 'Unknown Error Occcurred'
+                ];
+            }
+        } catch (RequestException | ClientException $e) {
+            $response = $e->getResponse();
+            if (empty($response)) {
+                throw new \Exception('Empty Response');
+            } else {
+                throw new \Exception((string)$response->getBody());
+            }
+        }
+    }
 }

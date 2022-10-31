@@ -301,6 +301,23 @@ The <code>$result</code> will be an object which contain data as follow:
 3. <code>error</code> : short info about the error
 3. <code>message</code> : long error message info
 
+#### __I. Add New Beneficiaries__
+
+New beneficiaries can only be added to an existing invoice item. Hence, make sure to prepare item that have left over share amount or item specifically prepared for new beneficiaries.
+``` php
+$result = $client->addBeneficiaries($ref, $beneficiaries);
+```
+
+<code>$ref</code> is the transaction reference code
+
+<code>$beneficiaries</code> is the list of new beneficiaries data to be added
+
+
+
+The <code>$result</code> will be an object which contain data as follow:
+
+1. <code>status</code> : success or failed
+
 ## Sandbox
 
 When using sandbox mode, the payment can be simulated by visiting [Sandbox Payment Simulation Page](https://dev.ratapay.co.id/simulate).
