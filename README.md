@@ -328,7 +328,7 @@ The default payment method will use Ratapay balance, so if the tested account di
 
 ## Callback
 
-Ratapay sends a POST callback on certain event, one of those is a succesful payment, which contains these data
+Ratapay sends a POST callback on certain event which contains these data:
 
 | property | type   | note                                 |
 |----------|--------|--------------------------------------|
@@ -346,7 +346,7 @@ $valid = hash_equals($_POST['hash'], hash_hmac('sha256', $_POST['data'], $mercha
 The data contains following information
 | Property       | Type    | Note                                        |
 |----------------|---------|---------------------------------------------|
-| action         | Integer | Callback action type = 1                    |
+| action         | Integer | Refer to Action List below*                    |
 | invoice_id     | String  | Invoice ID from merchant system             |
 | paysystem      | String  | Payment channel used to pay the transaction |
 | amount         | Integer | Amount of payment                           |
@@ -354,6 +354,17 @@ The data contains following information
 | gateway_charge | Integer | Gateway charge applied to payment           |
 | merchant_id    | Integer | Merchant ID                                 |
 | ref            | String  | Transaction reference number                |
+
+### *Action List
+| Action | Event   | 
+|--------|---------|
+| 1      | Payment Success |
+| 2      | - |
+| 3      | - |
+| 4      | Recurring Payment Failed |
+| 5      | Recurring Payment Success |
+| 6      | Refund Success |
+| 7      | Split Fund Success |
 
 ## Testing
 
