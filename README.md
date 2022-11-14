@@ -216,6 +216,12 @@ It can be used to execute refund before refund threshold.
 ``` php
 $result = $client->confirmRefund($reference, $params);
 ```
+
+The <code>$result</code> will be an object which contain data as follow:
+
+1. <code>status</code> : success or failed, indicating refund request status
+
+
 | Property            | Type    | Required    |  Default | Note   |
 |---------------------|---------|-------------|--------- |--------|
 | reference           | String  | Y           | ''       | Transaction reference code |
